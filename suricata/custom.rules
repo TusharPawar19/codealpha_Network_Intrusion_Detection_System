@@ -1,0 +1,16 @@
+# Basic Suricata Rules for NIDS Project
+# Rule format: action proto source_ip source_port -> dest_ip dest_port (options)
+
+# 1. Detect suspicious ICMP (Ping)
+alert icmp any any -> $HOME_NET any (msg:"Suspicious ICMP Ping Detected"; itype:8; sid:1000001; rev:1; classtype:misc-activity;)
+
+# 2. Detect SSH Port Scan attempts
+alert tcp any any -> $HOME_NET 22 (msg:"Potential SSH Brute Force/Scan"; flags:S; threshold:type limit, track by_src, count 5, seconds 60; sid:1000002; rev:1; classtype:attempted-recon;)
+
+# 3. Detect unauthorized Telnet access
+alert tcp any any -> $HOME_NET 23 (msg:"Cleartext Telnet Activity Detected"; sid:1000003; rev:1; classtype:bad-unknown;)
+
+# 4. Detect generic Nmap scans (often sends packets with no flags or FIN/URG/PSH)
+alert tcp any any -> $HOME_NET any (msg:"Nmap Null Scan Detected"; flags:0; sid:1000004; rev:1; classtype:attempted-recon;)
+alert tcp any any -> $HOME_NET any (msg:"Nmap XMAS Scan Detected"; flags:F,P,U; sid:1000005; rev:1; classtype:attempted-recon;)
+
